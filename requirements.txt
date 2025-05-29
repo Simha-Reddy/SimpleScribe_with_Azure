@@ -1,0 +1,13 @@
+flask
+Flask-Session
+python-dotenv
+requests
+sounddevice
+scipy
+psutil
+openai
+scikit-learn
+tqdm
+numpy
+markdown
+pdfplumber

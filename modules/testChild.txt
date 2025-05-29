@@ -1,0 +1,7 @@
+Title: Test Child
+Output: testChild
+
+[X] item
+
+Query: {item}
+AI Prompt: The parent module gave me the item: {item}. Please repeat it back in this sentence: "You selected: {item}".

@@ -1,0 +1,9 @@
+Title: Coding Support
+Output: billing
+[X] visitNotes
+[X] feedbackReply
+
+Query: 
+AI Prompt: To help a clinician code and bill properly, please review the clinic note below, and provide the following very brief response:
+1. Recommended CPT code based on complexity, likely time spent and/or any procedures. No need to provide reasoning in response, just the code.
+2. ICD-10 codes appropriate for the visit, each coupled with a corresponding SNOMED code.

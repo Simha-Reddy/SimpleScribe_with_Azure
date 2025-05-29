@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>SimpleScribeVA</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="global-top-bar">
+        <div class="left-controls">
+            <a href="/" class="header-title">SimpleScribeVA</a>
+            <button id="recordBtn" class="start-button">Start Recording</button>
+        </div>
+        <div class="right-controls">
+            <button id="endSessionBtn" class="danger-button" onclick="endSession()">End Session</button>
+            <a href="/scribe" title="Scribe">📝</a>
+            <a href="/explore" title="Explore Chart Data">🔍</a>
+            <a href="/archive" title="Transcripts">📁</a>
+            <a href="/settings" title="Settings">⚙️</a>
+            <button id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">&#9776;</button>
+        </div>
+    </div>
+    <div id="mobileMenu" class="mobile-menu">
+        <a href="/scribe">📝 Scribe</a>
+        <a href="/explore">🔍 Explore</a>
+        <a href="/archive">📁 Archive</a>
+        <a href="/settings">⚙️ Settings</a>
+        <hr class="mobile-menu-separator">
+        <a href="#" class="end-session-link" onclick="endSession();return false;" title="End Session">💾 Save and End</a>
+    </div>
+    <div class="container">
+        <!-- transcript / chart data side by side -->
+        <div class="side-by-side">
+            <div class="panel" style="border:none;">
+                <h2>1 | Transcript</h2>
+                <textarea id="rawTranscript" readonly
+                          style="width:100%; min-height:350px;"
+                          placeholder="Rough, real-time draft will appear here..."></textarea>
+                <div id="statusIndicator" style="margin-top:8px; font-style:italic; color:gray;"></div>
+            </div>
+            <div class="panel" style="border:none;">
+                <h2>Notes during visit</h2>
+                <textarea id="visitNotes"
+                          style="width:100%; min-height:350px;"
+                          placeholder="Jot down visit notes here..."></textarea>
+            </div>
+        </div>
+        
+        <!-- patient instructions -->
+         <h2>2 | Patient Instructions</h2>
+        <textarea id="patientInstructionsBox"
+                placeholder="Patient instructions will appear here..."></textarea>
+        <div id="patientInstructionsPreview" class="markdown-box"></div>
+        <div class="button-row">
+            <button id="generatePatientInstructionsBtn">Generate Patient Instructions</button>
+            <button id="printPatientInstructionsBtn" style="margin-left:12px;">Print as PDF</button>
+        </div>
+        <!-- prompt selector and preview -->
+        <h2>3 | Choose Prompt Template</h2>
+        <select id="promptSelector">
+            {% for prompt in prompt_templates %}
+                <option value="{{ prompt }}">{{ prompt }}</option>
+            {% endfor %}
+        </select>
+        <textarea id="promptPreview"
+                  placeholder="The selected prompt will appear here..."
+                  style="min-height:200px; width:100%"></textarea>
+
+        <!-- note creation -->
+        <h2>4 | Create Note</h2>
+        <div class="button-row">
+            <button onclick="createNote()">Create Note</button>
+            <button onclick="copyFinalNote()" style="margin-right: auto;">Copy Final Note</button>
+        </div>
+
+        <div id="feedbackReply"
+             style="margin-top:12px; padding:10px; background:#f0f0f0; min-height:300px;">
+        </div>
+        <!-- user feedback -->
+        <input id="feedbackInput"
+               type="text"
+               placeholder="Type feedback, further instructions or questions here and press Enter…"
+               style="width:100%; margin-top:10px"
+               onkeypress="if(event.key==='Enter'){ submitFeedback(); return false; }" />
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/static/SessionManager.js"></script>
+	<script src="/static/scribe.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>

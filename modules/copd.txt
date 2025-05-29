@@ -1,0 +1,16 @@
+Title: COPD
+Output: copd
+[X] chunkText
+
+Query: Check for any information about COPD
+AI Prompt: Provide a synopsis of the Veteran's COPD in a structured easy to read format:
+
+The example output I am seeking:
+COPD:
+- Medications:
+--Maintenance: Stiolto, Mometasone
+--Rescue: Albuterol HFA PRN
+- Last exacerbation: 1/22/25 VA ER, prescribed prednisone and azithromycin
+- Last PFTs: 2/24/23, FEV1 1.4 L (40% predicted)
+- Last chest CT: 2/1/25, centrilobular emphysema and 5mm RML pulmonary nodule
+- Consultation history: no prior pulmonary consults, or pulmonary rehabilitation referrals

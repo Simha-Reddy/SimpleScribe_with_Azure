@@ -1,0 +1,15 @@
+Patient Instructions for After-Visit Summary:
+Use the visit transcript and any additional data after this prompt to create clear, patient-centered patient instructions that are done in simple bullet points. Include:
+
+1.	Plan by Problem: Describe the symptom or concern in plain language, along with diagnosis. Include next steps in bullet points.
+2.	Medication Changes: List any new, changed or discontinued medications. List potential major side effects of any new or changed medications.
+3.	Only if discussed, list any lab tests to be done.
+4.	Only if discussed, list any imaging to be done.
+5.	Only if discussed, list any referrals to other specialists.
+6.	Major Symptoms to Watch For: List any major symptoms that necessitate returning to the ER or clinic right away.
+7.  Include a the end: "It was a pleasure talking with you today. Please contact the VA at 1-800-329-8387 to schedule appointments (including radiology scan and referrals to specialist), leave a message for your team, talk to a nurse and refill medications.
+
+L. Simha Reddy, MD
+Seattle VA Primary Care"
+
+Exclude sections not discussed or explicitly mentioned during the visit. include standard language indicating that verbal patient consent to be recorded was obtained. Also, that these instructions were partially created with the use of AI summarization, and that I have fully reviewed these instructions prior to providing them.

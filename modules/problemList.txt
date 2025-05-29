@@ -1,0 +1,7 @@
+Title: Problem List
+Output: problemList
+Chain: problemDetails
+[X] chunkText
+
+Query: Provide an active problem list of all significant health conditions and diagnoses.
+AI Prompt: Given the following chart text, list the most important patient problems or diagnoses, rank-ordered by severity. Output as a JSON array of problem names (strings).

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Explore Chart Data</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="global-top-bar">
+        <div class="left-controls">
+            <a href="/" class="header-title">SimpleScribeVA</a>
+            <button id="recordBtn" class="start-button">Start Recording</button>
+        </div>
+        <div class="right-controls">
+            <button id="endSessionBtn" class="danger-button" onclick="endSession()">End Session</button>
+            <a href="/scribe" title="Scribe">📝</a>
+            <a href="/explore" title="Explore Chart Data">🔍</a>
+            <a href="/archive" title="Transcripts">📁</a>
+            <a href="/settings" title="Settings">⚙️</a>
+            <button id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">&#9776;</button>
+        </div>
+    </div>
+    <div id="mobileMenu" class="mobile-menu">
+        <a href="/scribe">📝 Scribe</a>
+        <a href="/explore">🔍 Explore</a>
+        <a href="/archive">📁 Archive</a>
+        <a href="/settings">⚙️ Settings</a>
+        <hr class="mobile-menu-separator">
+        <a href="#" class="end-session-link" onclick="endSession();return false;" title="End Session">💾 Save and End</a>
+    </div>
+</div>
+<div class="container">
+    <h2>Explore Chart Data</h2>
+
+    <div class="side-by-side">
+        <!-- LEFT: Chart Data Input/Search/Display -->
+        <div class="panel" style="border:none;">
+            <h3>Chart Data</h3>
+            <div id="dropZone" class="drop-zone">
+                <textarea id="chunkText" placeholder="Paste chart text here or drop a PDF file..."></textarea>
+                <div class="drop-overlay">
+                    <span>Drop PDF here</span>
+                </div>
+            </div>
+            <div class="button-group">
+                <button id="exploreChartBtn" onclick="submitChartChunk()">Prepare Data</button>
+                <button id="openKeywordModalBtn">Keyword Search</button>
+            </div>
+            <div id="chunkStatus"></div>
+        </div>
+        <!-- RIGHT: OpenAI Query/Answer -->
+        <div class="panel" style="border:none;">
+            <h3>Query Chart</h3>
+            <input type="text" 
+                   id="exploreSearchBox" 
+                   placeholder="Ask a question and press Enter..." 
+                   onkeyup="if(event.key === 'Enter') runExploreSearch()">
+            <div id="exploreGptAnswer" class="markdown-box"></div>
+        </div>
+    </div>
+
+    <!-- Add this after your main flex row, before the button-row or at the end of .container -->
+    <div id="dynamicModules" style="margin-top:32px;"></div>
+</div>
+<div id="exploreSearchResults" style="margin-top:18px;"></div>
+
+<!-- Modal for paginated chart viewing -->
+<div id="chartModal">
+  <div id="chartModalInner">
+    <button id="closeChartModalBtn">&times;</button>
+
+    <!-- Modal header (keep your close button and page label here) -->
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 32px 0 32px;">
+      <button id="modalPrevBtn">&lt; Prev</button>
+      <span id="chartModalPageLabel"></span>
+      <button id="modalNextBtn">Next &gt;</button>
+    </div>
+
+    <!-- Horizontal page scroller -->
+    <div id="chartModalPageScroller"></div>
+
+    <!-- Main content -->
+    <div id="chartModalContent"></div>
+
+    <!-- Modal footer: keyword search and match navigation -->
+    <div id="chartModalFooter" class="modal-footer">
+      <input id="modalKeywordInput" type="text" placeholder="Keyword search..." />
+      <span id="modalMatchLabel"></span>
+      <button id="prevModalMatchBtn">&lt;</button>
+      <button id="nextModalMatchBtn">&gt;</button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/static/SessionManager.js"></script>
+<script src="/static/explore.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

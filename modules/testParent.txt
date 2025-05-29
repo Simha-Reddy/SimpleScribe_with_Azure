@@ -1,0 +1,6 @@
+Title: Test Parent
+Output: testParent
+Chain: testChild
+
+Query: List three fruits.
+AI Prompt: Output a JSON array of three fruit names.

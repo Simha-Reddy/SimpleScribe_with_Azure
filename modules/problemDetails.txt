@@ -1,0 +1,7 @@
+Title: Problem Details
+Output: problemDetails
+[X] chunkText
+[X] modR
+
+Query: {item}
+AI Prompt: For the problem: {item}, use the following chart text to find and list any relevant diagnostics (if any notable labs, radiology or studies), therapeutics (such as medications), and notable complications if any. Output as a list of brief markdown bullet points, each with a citation to where in chart it came from in the format (Page 64).

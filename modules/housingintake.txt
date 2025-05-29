@@ -1,0 +1,7 @@
+Title: Housing Intake
+Output: housingintake
+[X] chunkText
+[X] rawTranscript
+
+Query: Homelessness and housing history
+AI Prompt: Use the following chart data on this patient, as well as this transcript of a social work visit with the patient to create a summary of his housing challenges and episodes of homelessness over the last ten years. Return the summary in markDown format and provide citation in the format (SECTION, PAGE 47) or (TRANSCRIPT).

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Settings - SimpleScribeVA</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Additional styles for cleaner layout */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+
+        .button-row {
+            margin-top: 16px;
+        }
+
+        .button-row button {
+            margin-right: 8px;
+        }
+
+        .module-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #f3f6fa;
+        border-radius: 8px;
+        padding: 1em 1.2em;
+        margin-top: 0.5em;
+        border: 1px solid #e3e8ee;
+        }
+
+        .module-inputs label {
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        font-size: 1em;
+        cursor: pointer;
+        padding: 2px 0;
+        }
+
+        .module-inputs label:hover {
+        background: #eaf1fb;
+        border-radius: 4px;
+        }
+
+        .module-inputs input[type="checkbox"] {
+        accent-color: #1976d2;
+        margin-right: 0.7em;
+        width: 1.1em;
+        height: 1.1em;
+        }
+
+        .module-section {
+            margin-bottom: 32px;
+        }
+
+        /* Section containers */
+        .module-section {
+            background: #f8fafc;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e3e8ee;
+            padding: 2rem 1.5rem 1.5rem 1.5rem;
+            margin-bottom: 36px;
+            position: relative;
+        }
+
+        /* Section headers with icons */
+        .module-section h3 {
+            display: flex;
+            align-items: center;
+            font-size: 1.25em;
+            margin-top: 0;
+            margin-bottom: 1.2em;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .module-section.patient-instructions h3::before {
+            content: "💊";
+            margin-right: 0.5em;
+            font-size: 1.2em;
+        }
+
+        .module-section.templates h3::before {
+            content: "📝";
+            margin-right: 0.5em;
+            font-size: 1.2em;
+        }
+
+        .module-section.modules h3::before {
+            content: "🧩";
+            margin-right: 0.5em;
+            font-size: 1.2em;
+        }
+
+        /* Optional: accent border on left */
+        .module-section.templates {
+            border-left: 5px solid #1976d2;
+            background: #f3f8fd; /* subtle blue */
+        }
+        .module-section.modules {
+            border-left: 5px solid #43a047;
+            background: #f6fcf7; /* subtle green */
+        }
+        .module-section.patient-instructions {
+            border-left: 5px solid #8e24aa; /* purple accent */
+            background: #f9f6fc; /* subtle purple */
+        }
+
+        /* Fieldset styling for module details */
+        fieldset {
+            border: 1px solid #e3e8ee;
+            border-radius: 8px;
+            padding: 1.2em 1em 1em 1em;
+            margin-top: 1.5em;
+            background: #fff;
+        }
+        legend {
+            font-weight: 600;
+            color: #43a047;
+            font-size: 1.1em;
+            letter-spacing: 0.01em;
+        }
+    </style>
+</head>
+<body>
+    <div class="global-top-bar">
+        <div class="left-controls">
+            <a href="/" class="header-title">SimpleScribeVA</a>
+            <button id="recordBtn" class="start-button">Start Recording</button>
+        </div>
+        <div class="right-controls">
+            <button id="endSessionBtn" class="danger-button" onclick="endSession()">End Session</button>
+            <a href="/scribe" title="Scribe">📝</a>
+            <a href="/explore" title="Explore Chart Data">🔍</a>
+            <a href="/archive" title="Transcripts">📁</a>
+            <a href="/settings" title="Settings">⚙️</a>
+            <button id="hamburgerBtn" class="hamburger-btn" aria-label="Menu">&#9776;</button>
+        </div>
+    </div>
+    <div id="mobileMenu" class="mobile-menu">
+        <a href="/scribe">📝 Scribe</a>
+        <a href="/explore">🔍 Explore</a>
+        <a href="/archive">📁 Archive</a>
+        <a href="/settings">⚙️ Settings</a>
+        <hr class="mobile-menu-separator">
+        <a href="#" class="end-session-link" onclick="endSession();return false;" title="End Session">💾 Save and End</a>
+    </div>
+    <div class="container">
+        <h2>Settings (Customize Instructions, Prompts and Modules)</h2>
+
+<!-- Patient Instructions Prompt Section -->
+<div class="module-section patient-instructions">
+    <h3>Manage Patient Instructions Prompt</h3>
+    <div class="form-group">
+        <label for="patientInstructionsPromptText">Prompt Content</label>
+        <textarea id="patientInstructionsPromptText" placeholder="Enter your patient instructions prompt here..." rows="6"></textarea>
+    </div>
+    <div class="button-row">
+        <button id="savePatientInstructionsPromptBtn">Save Prompt</button>
+        <button id="clearPatientInstructionsPromptBtn">Clear</button>
+        <button id="resetPatientInstructionsPromptBtn" type="button">Reset to Default</button>
+        <span id="patientInstructionsPromptStatus" style="margin-left:12px;color:green;"></span>
+    </div>
+</div>
+
+<!-- Custom Prompt Templates Section -->
+        <div class="module-section templates">
+            <h3>Manage Custom Prompt Templates</h3>
+            <div class="form-group">
+                <label for="customTemplateDropdown">Select Template</label>
+                <select id="customTemplateDropdown">
+                    <option value="">-- Choose a template --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="customTemplateName">Template Name</label>
+                <input type="text" id="customTemplateName" placeholder="Enter the name of the template">
+            </div>
+            <div class="form-group">
+                <label for="customTemplateText">Template Content</label>
+                <textarea id="customTemplateText" placeholder="Enter your custom prompt here..." rows="6"></textarea>
+            </div>
+            <div class="button-row">
+                <button onclick="saveCustomTemplate()">Save Template</button>
+                <button onclick="deleteCustomTemplate()">Delete Template</button>
+                <button onclick="clearCustomTemplateEditor()">Clear</button>
+            </div>
+        </div>
+
+<!-- Smart Modules Section -->
+        <div class="module-section modules">
+            <h3>Manage Smart Modules</h3>
+            <div class="form-group">
+                <label for="moduleDropdown">Select Module</label>
+                <select id="moduleDropdown">
+                    <option value="">-- Choose a module --</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button onclick="loadModuleList()">Refresh Module List</button>
+            </div>
+            <hr>
+            <fieldset>
+                <legend>Module Details</legend>
+                <div class="form-group">
+                    <label for="moduleFileName">Filename</label>
+                    <input type="text" id="moduleFileName" placeholder="Enter the filename (e.g., module.txt)">
+                </div>
+                <div class="form-group">
+                    <label for="moduleTitle">Title</label>
+                    <input type="text" id="moduleTitle" placeholder="Enter the module title">
+                </div>
+                <div class="form-group">
+                    <label for="moduleOutput">Output</label>
+                    <input type="text" id="moduleOutput" placeholder="Name of output will be same as filename" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="moduleChain"><i>Optional:</i> Nesting modules (e.g. for each problem returned -> find treatments -> list meds)</label>
+                    <input type="text" id="moduleChain" placeholder="Add modules to the chain. Use commas for multiple. e.g. 'findTreatments,listMeds'">
+                </div>
+                <div class="form-group">
+                    <label>Inputs</label>
+                    <div class="module-inputs" id="moduleInputs">
+                        <label><input type="checkbox" value="chunkText"><i>Explore:&nbsp;</i>  Chart data</label>
+                        <label><input type="checkbox" value="exploreGptAnswer"><i>Explore:&nbsp;</i>  Query answer</label>
+                        <label><input type="checkbox" value="transcript"><i>Scribe:&nbsp;&nbsp;</i>  Visit transcript</label>
+                        <label><input type="checkbox" value="visitNotes"><i>Scribe:&nbsp;&nbsp;</i>  Visit notes</label>
+                        <label><input type="checkbox" value="feedbackReply"><i>Scribe:&nbsp;&nbsp;</i>  Note created today</label>
+                        <label><input type="checkbox" value="promptTemplate"><i>Scribe:&nbsp;&nbsp;</i>  Note prompt</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="moduleQuery">Search for the most relevant data to send <i>(needed only with Chart Data)</i></label>
+                    <textarea id="moduleQuery" placeholder="Enter your clinical question, to help narrow data..." rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="moduleAIPrompt">AI Prompt</label>
+                    <textarea id="moduleAIPrompt" placeholder="Enter your full prompt for AI..." rows="4"></textarea>
+                </div>
+                <div class="button-row">
+                    <button onclick="saveModule()">Save Module</button>
+                    <button onclick="deleteSelectedModule()">Delete</button>
+                    <button onclick="clearModuleEditor()">Clear</button>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <script src="/static/SessionManager.js"></script>
+    <script src="/static/settings.js"></script>
+    <script src="/static/app.js"></script>
+</body>
+</html>
