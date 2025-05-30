@@ -1,7 +1,16 @@
 Title: Problem Details
 Output: problemDetails
 [X] chunkText
-[X] modR
+[X] modResult
 
-Query: {item}
-AI Prompt: For the problem: {item}, use the following chart text to find and list any relevant diagnostics (if any notable labs, radiology or studies), therapeutics (such as medications), and notable complications if any. Output as a list of brief markdown bullet points, each with a citation to where in chart it came from in the format (Page 64).
+Query: For the patient's history of {modResult}, use the chart text below to find any relevant diagnostics (labs, radiology, studies), therapeutics (medications, procedures), and notable complications.
+AI Prompt: For the problem "{modResult}", use the following chart text to find and list:
+- Relevant diagnostics (e.g., notable labs, radiology, or studies)
+- Therapeutics (e.g., medications, procedures)
+- Notable complications
+
+Output as a markdown bullet list, each with a citation to where in the chart it came from in the format (Section, Page X). If nothing is found for a category, state "None found." Example:
+
+- **Diagnostics:** Hemoglobin A1c 8.2% (LABS, Page 12)
+- **Therapeutics:** Metformin 1000mg BID (MEDICATIONS, Page 14)
+- **Complications:** Diabetic neuropathy (ASSESSMENT, Page 22)

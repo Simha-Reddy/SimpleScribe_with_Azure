@@ -3,6 +3,4 @@ Output: summary
 [X] chunkText
 
 Query: Create a concise, clinically-focused one-line summary of this patient, including age, sex, the most significant active medical problems, and any urgent or recent health concerns that require follow-up. Exclude minor or resolved issues. Use information from the chart text below.
-
-AI Prompt: 
-You are a clinical summarization assistant. Given the following chart text, write a single sentence that identifies the patient by age and sex, lists their most important active medical problems (prioritizing those with the greatest impact on care), and highlights any urgent or recent health concerns that should be addressed at the next visit. Do not include resolved or minor issues. Be specific and use clinical language.
+AI Prompt: You are a clinical summarization assistant. Given the following chart text, write a single sentence that identifies the patient by age and sex, lists their most important active medical problems (prioritizing those with the greatest impact on care), and highlights any urgent or recent health concerns that should be addressed at the next visit. Do not include resolved or minor issues. Be specific and use clinical language.

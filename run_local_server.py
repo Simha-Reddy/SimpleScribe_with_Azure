@@ -354,14 +354,18 @@ def run_module_by_name(module_name, data, chunks, vectors, inverted_index, clien
     if "chunkText" in prompt_vars:
         print("chunkText length in prompt_vars:", len(prompt_vars["chunkText"]))
 
+    original_chunk_text = data.get("chunkText", None)
+
     # Use override_query if provided (for chaining), else use module's query
     search_query = override_query if override_query is not None else query
 
     # If chunkText is present, generate top_chunks and use them
     if "chunkText" in prompt_vars and prompt_vars["chunkText"].strip():
         if len(chunks) and vectors is not None and inverted_index:
+            print(f"[DEBUG] Hybrid search for module '{module_name}' with query: {search_query}")
             top_chunks = hybrid_search(client, deploy_embed, search_query, chunks, vectors, inverted_index, top_k=20)
-            print("Top chunks found:", len(top_chunks))
+            for i, c in enumerate(top_chunks[:3]):
+                print(f"[DEBUG] Top chunk {i+1}: Section={c.get('section')}, Page={c.get('page')}, Text={c['text'][:80]}")
             total_top_chunks_length = sum(len(c['text']) for c in top_chunks)
             print("Total top_chunks text length:", total_top_chunks_length)
             prompt_vars["top_chunks"] = "\n\n".join(
@@ -373,120 +377,7 @@ def run_module_by_name(module_name, data, chunks, vectors, inverted_index, clien
     # Always remove chunkText so it is never appended
     prompt_vars.pop("chunkText", None)
 
-    # Format the prompt
-    try:
-        formatted_prompt = prompt.format(**prompt_vars)
-    except Exception as e:
-        print("Prompt formatting error:", e)
-        formatted_prompt = prompt
-
-    # Append any prompt_vars not referenced in the prompt itself (except chunkText, which is never appended)
-    fields_to_append = []
-    for field, value in prompt_vars.items():
-        if f"{{{field}}}" not in prompt:
-            label = field.replace("_", " ").upper()
-            fields_to_append.append(f"\n\n{label}:\n{value}")
-            print(f"Appending field '{field}' to prompt, length: {len(str(value))}")
-
-    if fields_to_append:
-        formatted_prompt += "".join(fields_to_append)
-
-    print("Final formatted_prompt length:", len(formatted_prompt))
-    print("First 1000 chars of formatted_prompt:\n", formatted_prompt[:1000])
-    print("Calling ask_openai...")
-
-    result = ask_openai(formatted_prompt, [])
-
-    # --- Chaining logic for multiple modules ---
-    chain_results = {}
-    if chain:
-        json_text = extract_json_from_code_block(result)
-        try:
-            items = json.loads(json_text)
-            if not isinstance(items, list):
-                items = [items]
-        except Exception:
-            items = []
-        for chained_module in chain:
-            chain_results[chained_module] = []
-            for item in items:
-                child_data = dict(data)
-                child_data["item"] = item
-                child_data["modResult"] = item 
-                # Load child module's query
-                child_module_file = os.path.join(modules_dir, f"{chained_module}.txt")
-                child_query = chained_module  # fallback
-                if os.path.exists(child_module_file):
-                    with open(child_module_file, "r", encoding="utf-8") as f:
-                        for line in f:
-                            if line.startswith("Query:"):
-                                child_query = line.replace("Query:", "").strip()
-                            elif line.startswith("Query for chunkText chunk matching:"):
-                                child_query = line.replace("Query for chunkText chunk matching:", "").strip()
-                try:
-                    formatted_child_query = child_query.format(**child_data)
-                except Exception:
-                    formatted_child_query = child_query
-                child_result = run_module_by_name(
-                    chained_module, child_data, chunks, vectors, inverted_index, client, deploy_chat, deploy_embed, override_query=formatted_child_query
-                )
-                chain_results[chained_module].append({"item": item, "result": child_result})
-
-    return {output: result, **chain_results}
-
-@app.route("/run_module", methods=["POST"])
-def run_module():
-    data = request.get_json()
-    module_name = data.get("module")
-    prompt = data.get("prompt", "")
-    query = data.get("query", "")
-    selected_fields = data.get("selected_fields", [])
-    # All other fields are considered inputs
-    prompt_vars = {k: v for k, v in data.items() if k not in ("module", "prompt", "query", "selected_fields") and v is not None}
-
-    # Load embedded chart data from session
-    chunks = session.get("explore_chunks", [])
-    vectors = np.array(session.get("explore_vectors", []))
-    inverted_index = {k: set(v) for k, v in session.get("explore_index", {}).items()}
-
-    print("=== /run_module ===")
-    print("Module:", module_name)
-    print("Prompt vars keys:", list(prompt_vars.keys()))
-    print("Chunks available:", len(chunks))
-    print("Vectors shape:", getattr(vectors, "shape", None))
-    print("Inverted index keys:", len(inverted_index.keys()) if inverted_index else [])
-
-    # Load module definition
-    modules_dir = os.path.join(os.getcwd(), "modules")
-    module_file = os.path.join(modules_dir, f"{module_name}.txt")
-    if not os.path.exists(module_file):
-        return jsonify({"error": f"Module {module_name} not found."}), 404
-
-    with open(module_file, "r", encoding="utf-8") as f:
-        lines = [line.strip() for line in f.readlines()]
-    chain = []
-    output = module_name
-    for line in lines:
-        if line.startswith("Output:"):
-            output = line.replace("Output:", "").strip()
-        elif line.startswith("Chain:"):
-            chain = [s.strip() for s in line.replace("Chain:", "").split(",") if s.strip()]
-
-    # If chunkText is present, generate top_chunks and use them
-    if "chunkText" in prompt_vars and prompt_vars["chunkText"].strip():
-        if len(chunks) and vectors is not None and inverted_index:
-            top_chunks = hybrid_search(client, deploy_embed, query, chunks, vectors, inverted_index, top_k=20)
-            print("Top chunks found:", len(top_chunks))
-            total_top_chunks_length = sum(len(c['text']) for c in top_chunks)
-            print("Total top_chunks text length:", total_top_chunks_length)
-            prompt_vars["top_chunks"] = "\n\n".join(
-                f"### Source: {c.get('section','Unknown')} (Page {c.get('page','?')})\n{c['text']}" for c in top_chunks
-            )
-        else:
-            print("No embedded chart data found in session for hybrid search.")
-            prompt_vars["top_chunks"] = ""
-    # Always remove chunkText so it is never appended
-    prompt_vars.pop("chunkText", None)
+    # ...existing code...
 
     # Format the prompt
     try:
@@ -528,15 +419,52 @@ def run_module():
                 child_data = dict(data)
                 child_data["item"] = item
                 child_data["modResult"] = item
-                # Recursively run the chained module
+                # Restore chunkText for the child if missing
+                if "chunkText" not in child_data and original_chunk_text:
+                    child_data["chunkText"] = original_chunk_text
+                # Load child module's query
+                child_module_file = os.path.join(modules_dir, f"{chained_module}.txt")
+                child_query = chained_module  # fallback
+                if os.path.exists(child_module_file):
+                    with open(child_module_file, "r", encoding="utf-8") as f:
+                        for line in f:
+                            if line.startswith("Query:"):
+                                child_query = line.replace("Query:", "").strip()
+                            elif line.startswith("Query for chunkText chunk matching:"):
+                                child_query = line.replace("Query for chunkText chunk matching:", "").strip()
+                try:
+                    formatted_child_query = child_query.format(**child_data)
+                except Exception:
+                    formatted_child_query = child_query
+                # --- NEW: Run hybrid search for this item ---
+                if len(chunks) and vectors is not None and inverted_index:
+                    child_top_chunks = hybrid_search(client, deploy_embed, formatted_child_query, chunks, vectors, inverted_index, top_k=20)
+                    child_data["top_chunks"] = "\n\n".join(
+                        f"### Source: {c.get('section','Unknown')} (Page {c.get('page','?')})\n{c['text']}" for c in child_top_chunks
+                    )
+                else:
+                    child_data["top_chunks"] = ""
+                # Remove chunkText if present
+                child_data.pop("chunkText", None)
                 child_result = run_module_by_name(
-                    chained_module, child_data, chunks, vectors, inverted_index, client, deploy_chat, deploy_embed
+                    chained_module, child_data, chunks, vectors, inverted_index, client, deploy_chat, deploy_embed, override_query=formatted_child_query
                 )
                 chain_results[chained_module].append({"item": item, "result": child_result})
 
-    print("Returning:", {output: result, **chain_results})
-    return jsonify({output: result, **chain_results})
+    return {output: result, **chain_results}
 
+@app.route("/run_module", methods=["POST"])
+def run_module():
+    data = request.get_json()
+    module_name = data.get("module")
+    # Load embedded chart data from session
+    chunks = session.get("explore_chunks", [])
+    vectors = np.array(session.get("explore_vectors", []))
+    inverted_index = {k: set(v) for k, v in session.get("explore_index", {}).items()}
+    result = run_module_by_name(
+        module_name, data, chunks, vectors, inverted_index, client, deploy_chat, deploy_embed
+    )
+    return jsonify(result)
 
 @app.route("/process_chart_chunk", methods=["POST"])
 def process_chart_chunk():
